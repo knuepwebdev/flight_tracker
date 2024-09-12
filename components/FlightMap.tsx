@@ -16,32 +16,37 @@ const FlightMap = () => {
   });
 
   const [flights, setFlights] = useState([]);
+  const longitude = viewport?.longitude;
+  const latitude = viewport?.latitude;
+  const pollInterval = 10000
+  const radius = 25; // radius in nautical miles
+  const url = 'https://opensky-network.org/api/states/all?lamin=33.59700&lomin=-118.540534&lamax=34.078360&lomax=-117.824706';
+  const headers = new Headers({
+    'Authorization': `Basic ${btoa(process.env.NEXT_PUBLIC_OPENSKY_USERNAME + ':' + process.env.NEXT_PUBLIC_OPENSKY_PASSWORD)}`
+  });
 
   const fetchFlights = async () => {
-    const longitude = viewport?.longitude;
-    const latitude = viewport?.latitude;
-    const radius = 25; // radius in nautical miles
-    const url = `https://aviation-edge.com/v2/public/flights?lat=${latitude}&lng=${longitude}&distance=${radius}&status=en-route&key=${process.env.NEXT_PUBLIC_AVIATION_EDGE_API_KEY}`
-    
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, { headers: headers });
       const data = await response.json();
 
-      setFlights(data);
-
+      setFlights([...data.states]);
     } catch (error) {
       console.error("error", error.message);
     }
-  };  
+  };
 
   useEffect(() => {
     fetchFlights();
+    setTimeout(fetchFlights, 3000);
+    setTimeout(fetchFlights, 6000);
+    // setTimeout(fetchFlights, 7000);
+    // setInterval(fetchFlights, pollInterval);
   }, []);
 
   return (
     <ReactMapGL
       {...viewport}
-      dragPan={true}
       interactiveZoom={true} // Enables zoom with scroll
       mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       mapStyle="mapbox://styles/mapbox/outdoors-v12"
@@ -49,8 +54,8 @@ const FlightMap = () => {
       style={{width: '100vw', height: '100vh'}}
       >
     { flights?.map(flight => (
-      <div key={ flight.flight?.icaoNumber }>
-        <Marker longitude={ flight.geography?.longitude } latitude={ flight.geography?.latitude }>
+      <div key={ flight[0] }>
+        <Marker longitude={ flight[5] } latitude={ flight[6] }>
 
           
         </Marker>
