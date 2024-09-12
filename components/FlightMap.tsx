@@ -21,25 +21,30 @@ const FlightMap = () => {
   const [flights, setFlights] = useState([]);
   const longitude = viewport?.longitude;
   const latitude = viewport?.latitude;
-  const pollInterval = 3000
-  const url = 'https://opensky-network.org/api/states/all?lamin=33.59700&lomin=-118.540534&lamax=34.078360&lomax=-117.824706';
+  const pollInterval = 8000
+  const url = `${process.env.NEXT_PUBLIC_OPENSKY_BASE_URL}/api/states/all?lamin=33.59700&lomin=-118.540534&lamax=34.078360&lomax=-117.824706`;
   const headers = new Headers({
     'Authorization': `Basic ${btoa(process.env.NEXT_PUBLIC_OPENSKY_USERNAME + ':' + process.env.NEXT_PUBLIC_OPENSKY_PASSWORD)}`
   });
 
-  const fetchFlights = async () => {
+  const enRoute = (flight) => {
+    // Returns flights which are not on the ground
+    return !flight[8];
+  };
+
+  const fetchEnrouteFlights = async () => {
     try {
       const response = await fetch(url, { headers: headers });
       const data = await response.json();
 
-      setFlights([...data.states]);
+      setFlights([...data.states.filter(enRoute)]);
     } catch (error) {
       console.error("error", error.message);
     }
   };
 
   useEffect(() => {
-    fetchFlights();
+    fetchEnrouteFlights();
     // setTimeout(fetchFlights, 3000);
     // setTimeout(fetchFlights, 6000);
     // setTimeout(fetchFlights, 7000);
@@ -59,7 +64,11 @@ const FlightMap = () => {
     { flights?.map(flight => (
       <div key={ flight[0] }>
         <Marker longitude={ flight[5] } latitude={ flight[6] }>
-          <FontAwesomeIcon icon={faPlaneUp} size="2xl" />
+          <FontAwesomeIcon
+            icon={faPlaneUp}
+            size="2xl"
+            transform={{ rotate: Math.round(flight[10]) }}
+          />
         </Marker>
       </div>
     ))}
