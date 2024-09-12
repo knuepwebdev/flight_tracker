@@ -1,7 +1,10 @@
 "use client";
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlaneUp } from '@fortawesome/free-solid-svg-icons'
+faPlaneUp
 import * as React from 'react';
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import ReactMapGL, {
   Marker,
   Source,
@@ -18,8 +21,7 @@ const FlightMap = () => {
   const [flights, setFlights] = useState([]);
   const longitude = viewport?.longitude;
   const latitude = viewport?.latitude;
-  const pollInterval = 10000
-  const radius = 25; // radius in nautical miles
+  const pollInterval = 3000
   const url = 'https://opensky-network.org/api/states/all?lamin=33.59700&lomin=-118.540534&lamax=34.078360&lomax=-117.824706';
   const headers = new Headers({
     'Authorization': `Basic ${btoa(process.env.NEXT_PUBLIC_OPENSKY_USERNAME + ':' + process.env.NEXT_PUBLIC_OPENSKY_PASSWORD)}`
@@ -38,8 +40,8 @@ const FlightMap = () => {
 
   useEffect(() => {
     fetchFlights();
-    setTimeout(fetchFlights, 3000);
-    setTimeout(fetchFlights, 6000);
+    // setTimeout(fetchFlights, 3000);
+    // setTimeout(fetchFlights, 6000);
     // setTimeout(fetchFlights, 7000);
     // setInterval(fetchFlights, pollInterval);
   }, []);
@@ -53,15 +55,13 @@ const FlightMap = () => {
       onLoad={(event) => event.target.resize()}
       style={{width: '100vw', height: '100vh'}}
       >
+
     { flights?.map(flight => (
       <div key={ flight[0] }>
         <Marker longitude={ flight[5] } latitude={ flight[6] }>
-
-          
+          <FontAwesomeIcon icon={faPlaneUp} size="2xl" />
         </Marker>
-        
       </div>
-
     ))}
 
     </ReactMapGL>
