@@ -7,8 +7,7 @@ import * as React from 'react';
 import { useState, useEffect } from "react";
 import ReactMapGL, {
   Marker,
-  Source,
-  Layer,
+  Popup
 } from "react-map-gl";
 
 const FlightMap = () => {
@@ -19,6 +18,7 @@ const FlightMap = () => {
   });
 
   const [flights, setFlights] = useState([]);
+  const [popupOpen, setPopupOpen] = useState({});
   const longitude = viewport?.longitude;
   const latitude = viewport?.latitude;
   const pollInterval = 8000
@@ -43,12 +43,17 @@ const FlightMap = () => {
     }
   };
 
+  const convertAirspeedToKnots = (airspeedInMetersPerSecond) => {
+    return Math.round(airspeedInMetersPerSecond * 1.94384);
+  }
+
+  const convertAltitudeToFeet = (altitudeInMeters) => {
+    return Math.round(altitudeInMeters *3.28084)
+  }
+
   useEffect(() => {
     fetchEnrouteFlights();
-    // setTimeout(fetchFlights, 3000);
-    // setTimeout(fetchFlights, 6000);
-    // setTimeout(fetchFlights, 7000);
-    // setInterval(fetchFlights, pollInterval);
+    setInterval(fetchEnrouteFlights, pollInterval);
   }, []);
 
   return (
@@ -63,13 +68,31 @@ const FlightMap = () => {
 
     { flights?.map(flight => (
       <div key={ flight[0] }>
-        <Marker longitude={ flight[5] } latitude={ flight[6] }>
+        <Marker
+          longitude={ flight[5] }
+          latitude={ flight[6] }
+          onClick={ (event) => {
+            event.originalEvent.stopPropagation();
+            // Use the flight's unique icao24 identifier as the flag to control popups
+            setPopupOpen({ [flight[0]]: true });
+          }}
+        >
           <FontAwesomeIcon
             icon={faPlaneUp}
             size="2xl"
             transform={{ rotate: Math.round(flight[10]) }}
           />
         </Marker>
+        { popupOpen[flight[0]] && (
+          <Popup
+            longitude={ flight[5] }
+            latitude={ flight[6] }
+            anchor="bottom"
+          >
+            <div>{ flight[1] }</div>
+            <div>{ convertAltitudeToFeet(flight[13]) } { convertAirspeedToKnots(flight[9])}</div>
+          </Popup>
+        )}        
       </div>
     ))}
 
