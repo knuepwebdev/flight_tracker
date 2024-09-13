@@ -11,11 +11,11 @@ import ReactMapGL, {
 } from "react-map-gl";
 
 const FlightMap = () => {
-  const viewport = {
+  const [viewport, setViewport] = useState({
     latitude: 33.94,
     longitude: -118.40,
     zoom: 10,
-  };
+  });
 
   const [flights, setFlights] = useState([]);
   const [popupOpen, setPopupOpen] = useState({});
@@ -56,10 +56,12 @@ const FlightMap = () => {
 
   return (
     <ReactMapGL
+      reuseMaps
       {...viewport}
       mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       mapStyle="mapbox://styles/mapbox/outdoors-v12"
       onLoad={(event) => event.target.resize()}
+      onMove={event => setViewport(event.viewState)}
       style={{width: '100vw', height: '100vh'}}
       >
 
