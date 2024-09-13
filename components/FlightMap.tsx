@@ -11,16 +11,14 @@ import ReactMapGL, {
 } from "react-map-gl";
 
 const FlightMap = () => {
-  const [viewport, setViewport] = useState({
+  const viewport = {
     latitude: 33.94,
     longitude: -118.40,
     zoom: 10,
-  });
+  };
 
   const [flights, setFlights] = useState([]);
   const [popupOpen, setPopupOpen] = useState({});
-  const longitude = viewport?.longitude;
-  const latitude = viewport?.latitude;
   const pollInterval = 8000
   const url = `${process.env.NEXT_PUBLIC_OPENSKY_BASE_URL}/api/states/all?lamin=33.59700&lomin=-118.540534&lamax=34.078360&lomax=-117.824706`;
   const headers = new Headers({
