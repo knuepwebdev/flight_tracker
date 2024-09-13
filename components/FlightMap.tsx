@@ -20,7 +20,7 @@ const FlightMap = () => {
   const [flights, setFlights] = useState([]);
   const [popupOpen, setPopupOpen] = useState({});
   const pollInterval = 8000
-  const url = `${process.env.NEXT_PUBLIC_OPENSKY_BASE_URL}/api/states/all?lamin=33.59700&lomin=-118.540534&lamax=34.078360&lomax=-117.824706`;
+  const url = `${process.env.NEXT_PUBLIC_OPENSKY_BASE_URL}/states/all?lamin=33.59700&lomin=-118.540534&lamax=34.078360&lomax=-117.824706`;
   const headers = new Headers({
     'Authorization': `Basic ${btoa(process.env.NEXT_PUBLIC_OPENSKY_USERNAME + ':' + process.env.NEXT_PUBLIC_OPENSKY_PASSWORD)}`
   });
@@ -88,8 +88,9 @@ const FlightMap = () => {
             latitude={ flight[6] }
             anchor="bottom"
           >
-            <div>{ flight[1] }</div>
-            <div>{ convertAltitudeToFeet(flight[13]) } { convertAirspeedToKnots(flight[9])}</div>
+            <div>Callsign: { flight[1] }</div>
+            <div>Altitude: { convertAltitudeToFeet(flight[13]) } ft</div>
+            <div>Speed: { convertAirspeedToKnots(flight[9])} knots</div>
           </Popup>
         )}        
       </div>
