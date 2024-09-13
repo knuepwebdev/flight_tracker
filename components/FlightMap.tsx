@@ -57,7 +57,6 @@ const FlightMap = () => {
   return (
     <ReactMapGL
       {...viewport}
-      interactiveZoom={true} // Enables zoom with scroll
       mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       mapStyle="mapbox://styles/mapbox/outdoors-v12"
       onLoad={(event) => event.target.resize()}
