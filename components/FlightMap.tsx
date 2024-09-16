@@ -19,23 +19,21 @@ const FlightMap = () => {
 
   const [flights, setFlights] = useState([]);
   const [popupOpen, setPopupOpen] = useState({});
-  const pollInterval = 8000
-  const url = `${process.env.NEXT_PUBLIC_OPENSKY_BASE_URL}/states/all?lamin=33.59700&lomin=-118.540534&lamax=34.078360&lomax=-117.824706`;
-  const headers = new Headers({
-    'Authorization': `Basic ${btoa(process.env.NEXT_PUBLIC_OPENSKY_USERNAME + ':' + process.env.NEXT_PUBLIC_OPENSKY_PASSWORD)}`
-  });
+  const pollInterval = 8000;
 
-  const enRoute = (flight) => {
-    // Returns flights which are not on the ground
-    return !flight[8];
-  };
-
-  const fetchEnrouteFlights = async () => {
+  const fetchFlights = async () => {
     try {
-      const response = await fetch(url, { headers: headers });
+      const response = await fetch('/api/flights', {
+        cache: 'no-store',
+        next: { revalidate: 0 },
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
       const data = await response.json();
 
-      setFlights([...data.states.filter(enRoute)]);
+      setFlights([...data?.flights]);
     } catch (error) {
       console.error("error", error.message);
     }
@@ -50,8 +48,8 @@ const FlightMap = () => {
   }
 
   useEffect(() => {
-    fetchEnrouteFlights();
-    setInterval(fetchEnrouteFlights, pollInterval);
+    fetchFlights();
+    setInterval(fetchFlights, pollInterval);
   }, []);
 
   return (
