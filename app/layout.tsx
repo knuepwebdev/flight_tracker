@@ -28,6 +28,7 @@ export default function RootLayout({
       <head>
         <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css' rel='stylesheet' />
         <script async src="https://kit.fontawesome.com/f7241a4255.js" crossOrigin="anonymous"></script>
+        <title>Real Time Flight Tracker</title>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

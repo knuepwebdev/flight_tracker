@@ -1,6 +1,8 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+import { NextResponse } from 'next/server'
+
 export async function GET() {
 	const url = `${process.env.NEXT_PUBLIC_OPENSKY_BASE_URL}/states/all?lamin=33.59700&lomin=-118.540534&lamax=34.078360&lomax=-117.824706`;
   const headers = new Headers({
@@ -16,9 +18,9 @@ export async function GET() {
     const response = await fetch(url, { headers: headers });
     const data = await response.json();
 
-    return Response.json({ flights: data.states.filter(enRoute) })
+    return NextResponse.json({ flights: data.states.filter(enRoute) })
   } catch (error) {
-    console.error("error", error.message);
-    // retuen error response
+    console.log('error: %o', error);
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }	   
 }
