@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest) {
 	const params = req.nextUrl.searchParams;

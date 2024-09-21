@@ -1,8 +1,10 @@
+import React from 'react'
+
 const Conditional = ({
 	showWhen, children
 }: {
 	showWhen: boolean;
-	children: ReactNode;
+	children: React.ReactNode;
 }) => {
 	if (showWhen) {
 		return <>{ children }</>;

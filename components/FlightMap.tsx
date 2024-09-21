@@ -23,13 +23,13 @@ const FlightMap = () => {
     zoom: 10
   });
 
-  const [flights, setFlights] = useState([]);
+  const [flights, setFlights] = useState<(string|number)[]>([]);
   const [popupOpen, setPopupOpen] = useState({});
   const [airline, setAirline] = useState('');
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const pollInterval = 8000;
-  const fetchArgs = {
+  const fetchArgs:RequestInit = {
     cache: 'no-store',
     next: { revalidate: 0 },
     headers: {
@@ -37,6 +37,7 @@ const FlightMap = () => {
       'Content-Type': 'application/json'
     }
   };
+
 
   const fetchFlights = async () => {
     try {
@@ -118,17 +119,17 @@ const FlightMap = () => {
             latitude={ flight[6] }
             anchor="bottom"
           >
-            <Conditional showWhen={ airline }>
+            <Conditional showWhen={ Boolean(airline) }>
               <div>Airline: { airline } </div>
             </Conditional>
             
             <div>Callsign: { flight[1] }</div>
             <div>Altitude: { convertAltitudeToFeet(flight[13]) } ft</div>
             <div>Speed: { convertAirspeedToKnots(flight[9])} knots</div>
-            <Conditional showWhen={ origin }>
+            <Conditional showWhen={ Boolean(origin) }>
               <div>Origin: { origin } </div>
             </Conditional>
-            <Conditional showWhen={ destination }>
+            <Conditional showWhen={ Boolean(destination) }>
               <div>Destination: { destination }</div>
             </Conditional>
           </Popup>
