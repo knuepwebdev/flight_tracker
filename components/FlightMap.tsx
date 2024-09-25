@@ -113,7 +113,7 @@ const FlightMap = () => {
             transform={{ rotate: Math.round(flight[10]) }}
           />
         </Marker>
-        { popupOpen[flight[0]] && (
+        <Conditional showWhen={ Boolean(popupOpen[flight[0]]) }>
           <Popup
             longitude={ flight[5] }
             latitude={ flight[6] }
@@ -133,7 +133,7 @@ const FlightMap = () => {
               <div>Destination: { destination }</div>
             </Conditional>
           </Popup>
-        )}        
+        </Conditional>  
       </div>
     ))}
 
