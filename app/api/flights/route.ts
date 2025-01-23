@@ -3,8 +3,11 @@ export const revalidate = 0;
 
 import { NextResponse } from 'next/server'
 
-export async function GET() {
-	const url = `${process.env.NEXT_PUBLIC_OPENSKY_BASE_URL}/states/all?lamin=33.59700&lomin=-118.540534&lamax=34.078360&lomax=-117.824706`;
+export async function GET(req: NextRequest) {
+  const params = req.nextUrl.searchParams;
+
+	const url = `${process.env.NEXT_PUBLIC_OPENSKY_BASE_URL}/states/all?lamin=${ params.get('latitude_min') }&lomin=${ params.get('longitude_min') }&lamax=${ params.get('latitude_max') }&lomax=${ params.get('longitude_max') }`;
+  
   const headers = new Headers({
     'Authorization': `Basic ${btoa(process.env.NEXT_PUBLIC_OPENSKY_USERNAME + ':' + process.env.NEXT_PUBLIC_OPENSKY_PASSWORD)}`
   })

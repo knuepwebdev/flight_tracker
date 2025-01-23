@@ -27,6 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css' rel='stylesheet' />
+        <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css" type="text/css" />
         <script async src="https://kit.fontawesome.com/f7241a4255.js" crossOrigin="anonymous"></script>
         <title>Real Time Flight Tracker</title>
       </head>

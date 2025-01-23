@@ -3,12 +3,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlaneUp } from '@fortawesome/free-solid-svg-icons'
 import * as React from 'react';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Conditional from "components/Conditional";
 import ReactMapGL, {
   Marker,
   Popup
 } from "react-map-gl";
+import GeocoderControl from 'components/GeocoderControl';
 
 const FlightMap = () => {
   interface IViewport {
@@ -17,12 +18,12 @@ const FlightMap = () => {
     zoom: number;
   };
 
-  const [viewport, setViewport] = useState<IViewport>({
+  const defaultViewport = {
     latitude: 33.94,
     longitude: -118.40,
-    zoom: 10
-  });
-
+    zoom: 10    
+  };
+  const [viewport, setViewport] = useState<IViewport>(defaultViewport);
   const [flights, setFlights] = useState<(string|number)[]>([]);
   const [popupOpen, setPopupOpen] = useState({});
   const [airline, setAirline] = useState('');
@@ -38,10 +39,21 @@ const FlightMap = () => {
     }
   };
 
-
   const fetchFlights = async () => {
+    const offset = 0.4;
+    const latitude_min = viewport.latitude - offset;
+    const latitude_max = viewport.latitude + offset;
+    const longitude_min = viewport.longitude - offset;
+    const longitude_max = viewport.longitude + offset;
+
     try {
-      const resp = await fetch('/api/flights', fetchArgs);
+      const resp = await fetch('/api/flights?' + new URLSearchParams({
+        latitude_min: latitude_min,
+        latitude_max: latitude_max,
+        longitude_min: longitude_min,
+        longitude_max: longitude_max
+      }).toString(), fetchArgs);
+
       const data = await resp.json();
 
       setFlights([...data?.flights]);
@@ -81,9 +93,14 @@ const FlightMap = () => {
     return Math.round(altitudeInMeters *3.28084)
   }
 
+  const handleViewportChange = useCallback(
+    (newViewport) => setViewport(newViewport),
+    []
+  );  
+
   useEffect(() => {
     fetchFlights();
-    setInterval(fetchFlights, pollInterval);
+    // setInterval(fetchFlights, pollInterval);
   }, []);
 
   return (
@@ -92,10 +109,17 @@ const FlightMap = () => {
       {...viewport}
       mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       mapStyle="mapbox://styles/mapbox/outdoors-v12"
-      onLoad={(event) => event.target.resize()}
-      onMove={event => setViewport(event.viewState)}
+      onLoad={ (event) => event.target.resize() }
+      onMove={ event => setViewport(event.viewState) }
+      onMoveEnd={ event => fetchFlights() }
       style={{width: '100vw', height: '100vh'}}
       >
+
+      <GeocoderControl
+        mapboxAccessToken={ process.env.NEXT_PUBLIC_MAPBOX_TOKEN }
+        position="top-left"
+        zoom={ viewport.zoom.toString() }
+      />
 
     { flights?.map(flight => (
       <div key={ flight[0] }>

@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest) {
 	const params = req.nextUrl.searchParams;
-	// // https://api.adsbdb.com/v0/aircraft/a01112?callsign=AAL3
 	const url = `${ process.env.NEXT_PUBLIC_ADSBDB_BASE_URL }/v0/aircraft/${ params.get('icao24') }?callsign=${ params.get('callsign') }`;
 
   try {
