@@ -3,9 +3,10 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlaneUp } from '@fortawesome/free-solid-svg-icons'
 import * as React from 'react';
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Conditional from "components/Conditional";
 import ReactMapGL, {
+  MapRef,
   Marker,
   Popup
 } from "react-map-gl";
@@ -24,11 +25,10 @@ const FlightMap = () => {
     zoom: 10    
   };
   const [viewport, setViewport] = useState<IViewport>(defaultViewport);
+  const mapRef = useRef<MapRef>();
   const [flights, setFlights] = useState<(string|number)[]>([]);
   const [popupOpen, setPopupOpen] = useState({});
   const [airline, setAirline] = useState('');
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
   const pollInterval = 8000;
   const fetchArgs:RequestInit = {
     cache: 'no-store',
@@ -81,8 +81,6 @@ const FlightMap = () => {
 
   const setFlightDetails = (flightDetails) => {
     setAirline(flightDetails?.flightroute?.airline?.name)
-    setOrigin(flightDetails?.flightroute?.origin?.municipality)
-    setDestination(flightDetails.flightroute?.destination?.municipality)
   }
 
   const convertAirspeedToKnots = (airspeedInMetersPerSecond) => {
@@ -93,32 +91,34 @@ const FlightMap = () => {
     return Math.round(altitudeInMeters *3.28084)
   }
 
-  const handleViewportChange = useCallback(
-    (newViewport) => setViewport(newViewport),
-    []
-  );  
+  const handleViewportChange = useCallback((newViewport) => {
+    const vp = (({ latitude, longitude, zoom }) => ({ latitude, longitude, zoom }))(newViewport.viewState);
+    setViewport(vp);
+  }, [viewport]);
 
   useEffect(() => {
     fetchFlights();
-    // setInterval(fetchFlights, pollInterval);
-  }, []);
+    const intervalId = setInterval(fetchFlights, pollInterval);
+
+    return () => clearInterval(intervalId);
+  }, [viewport]);
 
   return (
     <ReactMapGL
       reuseMaps
       {...viewport}
+      ref={mapRef}
       mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       mapStyle="mapbox://styles/mapbox/outdoors-v12"
       onLoad={ (event) => event.target.resize() }
-      onMove={ event => setViewport(event.viewState) }
-      onMoveEnd={ event => fetchFlights() }
+      onMove={handleViewportChange}
       style={{width: '100vw', height: '100vh'}}
       >
 
       <GeocoderControl
         mapboxAccessToken={ process.env.NEXT_PUBLIC_MAPBOX_TOKEN }
         position="top-left"
-        zoom={ viewport.zoom.toString() }
+        zoom={10}
       />
 
     { flights?.map(flight => (
@@ -150,12 +150,6 @@ const FlightMap = () => {
             <div>Callsign: { flight[1] }</div>
             <div>Altitude: { convertAltitudeToFeet(flight[13]) } ft</div>
             <div>Speed: { convertAirspeedToKnots(flight[9])} knots</div>
-            <Conditional showWhen={ Boolean(origin) }>
-              <div>Origin: { origin } </div>
-            </Conditional>
-            <Conditional showWhen={ Boolean(destination) }>
-              <div>Destination: { destination }</div>
-            </Conditional>
           </Popup>
         </Conditional>  
       </div>
