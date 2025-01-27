@@ -19,7 +19,7 @@ function Header() {
       {/* Small screen navbar */}
 
       {/* Top navbar */}
-      <nav className="lg:hidden flex items-center w-[100vw] absolute top-0 z-[30] bg-gray-800 overflow-hidden">
+      <nav className="lg:hidden flex items-center w-[100vw] top-0 z-[30] bg-gray-800 overflow-hidden">
       	<img src='logo.jpg' alt="Logo" className='flex-none max-w-[10%] max-h-full' />
         <p className="grow text-center text-[24px] text-center text-gray-200 font-serif]">
           Look at the Wings on That
